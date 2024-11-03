@@ -1,0 +1,43 @@
+service: bitpilani-image-moderation
+
+plugins:
+  - serverless-offline
+  
+frameworkVersion: "4"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 2000
+  timeout: 300
+  stage: dev
+  region: ap-south-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:*
+          Resource: "*"
+        - Effect: "Allow"
+          Action:
+            - "rekognition:*"
+          Resource: "*"   
+
+functions:
+  imageAnalysis:
+    handler: src/imageModeration/handler/imageModeration.handler
+    events:
+      - http:
+          path: '/imageAnalysis'
+          method: post
+          cors: true
+          integration: lambda-proxy
+  pdfAnalysis:
+    handler: src/imageModeration/handler/pdfModeration.handler
+    events:
+      - http:
+          path: '/pdfAnalysis'
+          method: post
+          cors: true
+          integration: lambda-proxy  
